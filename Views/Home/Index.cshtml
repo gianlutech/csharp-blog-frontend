@@ -1,0 +1,202 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mt-3 mb-3">Lista posts</h1>
+                <a class="btn btn-primary"
+                   href="@Url.Action("Create", "Home")">
+                    Nuovo post
+                </a>
+                 <a class="btn btn-primary"
+                   href="@Url.Action("CreateFile", "Home")">
+                    Nuovo post con file img
+                </a>
+            </div>
+
+          @*  form per la ricerca:*@
+
+          <form method="post" onsubmit="search(event)">
+
+            <label for="gsearch">Ricerca </label>
+            <input type="search" id="gsearch" name="gsearch">
+
+            <input type="submit"  value="ricerca">
+
+          </form>
+            
+
+            <h3 class="js_no_post text-center d-none">Non hai inserito alcun post</h3>
+
+            <table class="js_post_table table post-list-table d-none">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Immagine</th>
+                        <th>Titolo</th>
+                        <th>Descrizione</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+<script type="text/javascript">
+
+    loadList();
+
+    
+    function loadList() {
+
+        //utilizza axios per la chiamata all'api dei post
+
+        axios.get('https://localhost:5000/api/posts').then((res) => {
+
+            console.log('risultato ok', res);
+
+            if (res.data.length == 0) {
+
+                document.querySelector('.js_no_post').classList.remove('d-none');
+                document.querySelector('.js_post_table').classList.add('d-none');
+
+            } else {
+
+                document.querySelector('.js_post_table').classList.remove('d-none');
+                document.querySelector('.js_no_post').classList.add('d-none');
+
+
+                document.querySelector('.js_post_table tbody').innerHTML = '';
+
+                res.data.forEach(post => {
+
+                    console.log('post', post);
+
+                    document.querySelector('.js_post_table tbody').innerHTML += 
+                        `
+                        <tr>
+	                        <td>${post.id}</td>
+                            <td class="image"><img src="${post.image}"></td>
+	                        <td class="title">${post.title}</td>
+	                        <td class="description">${post.description}</td>
+	                        <td class="items-buttons">
+                                <div class="buttons">
+                                    
+                                    <a type="button" class="btn btn-info btn-sm" href="/home/DetailBlob/${post.id}">
+			                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+		                            </a>
+
+		                            <a type="button" class="btn btn-info btn-sm" href="/home/details/${post.id}">
+			                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+		                            </a>
+		                            <a type="button" class="btn btn-warning btn-sm" href="/home/update/${post.id}">
+			                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polygon points="14 2 18 6 7 17 3 17 3 13 14 2"></polygon><line x1="3" y1="22" x2="21" y2="22"></line></svg>
+		                            </a>
+		                            <a type="button" class="btn btn-danger btn-sm" onclick="deleteItem(${post.id})">
+			                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+		                            </a>
+                                </div>
+	                        </td>
+                        </tr>
+                        `;
+                });
+            }
+        });
+       
+
+    }
+
+    function search(event)
+    {
+        event.preventDefault();
+
+        let stringa = document.getElementById("gsearch");
+
+        stringa = stringa.value;
+
+        axios.get(`https://localhost:5000/api/posts/?stringa=${stringa}`).then((res)=>{
+            
+        console.log(res);
+
+         if (res.data.length == 0) {
+
+                document.querySelector('.js_no_post').classList.remove('d-none');
+                document.querySelector('.js_post_table').classList.add('d-none');
+
+            } else {
+
+                document.querySelector('.js_post_table').classList.remove('d-none');
+                document.querySelector('.js_no_post').classList.add('d-none');
+
+
+                document.querySelector('.js_post_table tbody').innerHTML = '';
+
+                res.data.forEach(post => {
+
+                    console.log('post', post);
+
+                    document.querySelector('.js_post_table tbody').innerHTML += 
+                        `
+                        <tr>
+	                        <td>${post.id}</td>
+                            <td class="image"><img src="${post.image}"></td>
+	                        <td class="title">${post.title}</td>
+	                        <td class="description">${post.description}</td>
+	                        <td class="items-buttons">
+                                <div class="buttons">
+                                    
+                                    <a type="button" class="btn btn-info btn-sm" href="/home/DetailBlob/${post.id}">
+			                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+		                            </a>
+
+		                            <a type="button" class="btn btn-info btn-sm" href="/home/details/${post.id}">
+			                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+		                            </a>
+		                            <a type="button" class="btn btn-warning btn-sm" href="/home/update/${post.id}">
+			                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polygon points="14 2 18 6 7 17 3 17 3 13 14 2"></polygon><line x1="3" y1="22" x2="21" y2="22"></line></svg>
+		                            </a>
+		                            <a type="button" class="btn btn-danger btn-sm" onclick="deleteItem(${post.id})">
+			                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+		                            </a>
+                                </div>
+	                        </td>
+                        </tr>
+                        `;
+                });
+            }
+        
+        });
+
+
+        return false;
+    
+    }
+
+    // da notare che è collegato all'onclick del button delete del singolo elemento
+    function deleteItem(itemId) {
+
+        // dire che nella realtà si potrebbe fare un alert di confirma più elaborato, ma per semplicità qua lo lasciamo così
+        const isDelete = confirm('Sei sicuro di voler eliminare il post selezionato?');
+
+        if (isDelete) {
+
+            axios.delete(`https://localhost:5000/api/posts/${itemId}`).then((res) => {
+
+                loadList();
+
+            }).catch((res) => {
+
+                alert('Errore!');
+
+                console.error('risultato errore', res);
+            });
+        }
+    }
+
+</script>
+}

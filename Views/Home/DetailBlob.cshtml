@@ -1,0 +1,71 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mt-3 mb-3">Dettaglio Post</h1>
+
+            </div>
+
+
+
+           
+            <div class="dettaglio">
+
+                
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+<script type="text/javascript">
+
+        loaddati();
+
+        function loaddati()
+        {
+           let id = parseInt(@ViewData["id"]);
+
+            axios.get(`https://localhost:5000/api/posts/${id}`).then((res) => {
+
+            console.log('risposta', res);
+
+            if (res.data.length == 0) {
+
+                console.log("Errore");
+
+            } else {
+
+               
+
+                    document.querySelector('.dettaglio').innerHTML = 
+                        `
+                        <div class="card" style="width: 90%; margin:auto">
+                            <img src="data:image/png;base64,${ res.data.imageBytes}" class="card-img-top" alt="...">
+
+                             <div class="card-body">
+
+                             <h5 class="card-title">${ res.data.title}</h5>
+
+                              <p class="card-text">${ res.data.description}</p>
+                               
+                              <a href="/home/index" class="btn btn-primary">Vai alla lista dei post</a>
+
+                             </div>
+                        </div>
+                       
+                        `;
+                
+            }
+        });
+
+   
+        }
+
+</script>
+
+}

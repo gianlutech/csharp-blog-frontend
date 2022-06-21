@@ -1,0 +1,134 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex align-items-center">
+                <h1 class="mt-3 mb-3">Modifica post</h1>
+            </div>
+            <form method="post" onsubmit="submitForm(event)">
+                <div class="mb-3">
+                    <strong>Immagine:</strong>
+                    <input class="js_input_image form-control d-block w-100" />
+                    <span class="js_input_image_validation text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Titolo:</strong>
+                    <input class="js_input_title form-control d-block w-100" />
+                    <span class="js_input_title_validation text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Contenuto:</strong>
+                    <textarea rows="10" class="js_input_description form-control d-block w-100"></textarea>
+                    <span class="js_input_description_validation text-danger"></span>
+                </div>
+                <div class="text-end">
+                    <input type="submit" class="btn btn-small btn-success" value="Salva">
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- se si vuole questa parte la si può mettere in una partial e farlo vedere agli studenti. -->
+<div class="js-alert-success alert alert-success d-none mt-3" role="alert">
+  Salvataggio avvenuto correttamente
+</div>
+
+@section Scripts {
+
+<script type="text/javascript">
+
+    // leggiamo dall'url l'id dell'elemento
+    const itemIdstring = location.href.substring(location.href.lastIndexOf('/') + 1);
+
+    let itemId = parseInt(itemIdstring);
+
+
+    // carichiamo i dati dell'elemento
+    axios.get(`https://localhost:5000/api/posts/${itemId}`).then((res) => {
+
+        console.log('risultato ok', res.data);
+
+        document.querySelector('.js_input_title').value = res.data.title;
+        document.querySelector('.js_input_description').value = res.data.description;
+        document.querySelector('.js_input_image').value = res.data.image;
+
+    }).catch((res) => {
+
+        console.error('risultato errore', res);
+    });
+
+    function submitForm(event) {
+
+        event.preventDefault();
+
+        axios.put(`https://localhost:5000/api/posts/${itemId}`, {
+            Id:itemId,
+            Title: document.querySelector('.js_input_title').value,
+            Description: document.querySelector('.js_input_description').value,
+            Image: document.querySelector('.js_input_image').value,
+        }).then((res) => {
+
+            console.log('risultato ok', res.data);
+
+            // facciamo uscire un alert di avvenuto salvataggio che poi viene rimosso e si torna alla home
+            document.querySelector('.js-alert-success').classList.remove('d-none');
+
+            setTimeout(function() {
+
+                location.href = "/";
+
+            }, 2000);
+
+        }).catch((res) => {
+
+            console.error('risultato errore', res);
+
+            //gestisciErroriValidazione(res.response.data.errors);
+        });
+    }
+
+    // facciamo notare che questa funzione è uguale a quella delle pagina di modifica..si potrebbe accentrare...
+    function gestisciErroriValidazione(listaErrori) {
+
+        console.error('risultato errore', listaErrori);
+
+        pulisciValidazioniForm();
+
+        // gestiamo gli errori di validazione
+
+        if (listaErrori.Image != undefined) {
+
+            listaErrori.Image.forEach(errorMessage => {
+
+                document.querySelector('.js_input_image_validation').innerHTML += errorMessage + '<br>';
+            })
+        }
+
+        if (listaErrori.Title != undefined) {
+
+            listaErrori.Title.forEach(errorMessage => {
+
+                document.querySelector('.js_input_title_validation').innerHTML += errorMessage + '<br>';
+            })
+        }
+
+        if (listaErrori.Description != undefined) {
+
+            listaErrori.Description.forEach(errorMessage => {
+
+                document.querySelector('.js_input_description_validation').innerHTML += errorMessage + '<br>';
+            })
+        }
+    }
+
+    function pulisciValidazioniForm() {
+
+        document.querySelector('.js_input_title_validation').innerHTML = '';
+        document.querySelector('.js_input_description_validation').innerHTML = '';
+        document.querySelector('.js_input_image_validation').innerHTML = '';
+    }
+
+</script>
+
+}
